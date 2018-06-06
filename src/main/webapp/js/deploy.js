@@ -24,7 +24,8 @@ function deploy(eventCode) {
         //Load a specific compiler version
         BrowserSolc.loadVersion(soljsonReleases[solidityVersion], function (solc) {
             // BrowserSolc.loadVersion("soljson-v0.4.23+commit.124ca40d.js", function (solc) {
-            console.log('Compiling contract with solc...');
+            console.log(`Compiling contract with solc ${solidityVersion}...`);
+            console.log('Contract source: ', source)
             optimize = 1;
             const output = solc.compile(source, optimize);
             console.log('compiled contract: ', output);
@@ -41,7 +42,7 @@ function deploy(eventCode) {
             const contractInstance = contract.new({
                 data: '0x' + bytecode,
                 gas: 200000,
-                gasPrice: 4
+                gasPrice: 5
             }, (err, res) => {
                 if (err) {
                     console.error(err);

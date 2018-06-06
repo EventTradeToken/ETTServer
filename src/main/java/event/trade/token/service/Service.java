@@ -2,14 +2,12 @@ package event.trade.token.service;
 
 import event.trade.token.contract.SmartContract;
 import event.trade.token.storage.Contract;
+import event.trade.token.storage.Event;
 import event.trade.token.storage.Product;
 import event.trade.token.storage.Storage;
 import org.json.JSONArray;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -25,6 +23,14 @@ public class Service {
     public Response getMsg(@PathParam("param") String msg) {
         String output = "Jersey say : " + msg;
         return Response.status(200).entity(output).build();
+    }
+
+    @POST
+    @Path("/new")
+    @Consumes("application/json")
+    public Response newEvent(NewEventRequest body) {
+        Storage.save(body.getEvent(), body.getContract());
+        return Response.status(200).build();
     }
 
     @GET
@@ -49,5 +55,31 @@ public class Service {
     public Response buyProduct(@PathParam("eventCode") String eventCode, @PathParam("client") String client, @PathParam("productCode") String productCode) {
         Storage.getContract(eventCode).buyProduct(eventCode, client, productCode);
         return Response.status(200).build();
+    }
+}
+
+class NewEventRequest {
+    private Event event;
+    private Contract contract;
+
+    public NewEventRequest(Event event, Contract contract) {
+        this.event = event;
+        this.contract = contract;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public Contract getContract() {
+        return contract;
+    }
+
+    public void setContract(Contract contract) {
+        this.contract = contract;
     }
 }
