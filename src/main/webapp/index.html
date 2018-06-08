@@ -5,7 +5,7 @@
     <script src="./js/libs/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
     <script src="http://code.dappbench.com/browser-solc.min.js" type="text/javascript"></script>
     <script src="./js/contract.js?r=9"></script>
-    <script src="./js/deploy.js?r=14"></script>
+    <script src="./js/deploy.js?r=20"></script>
     <link href="./js/libs/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet"/>
     <link href="./js/libs/bootstrap-3.3.7-dist/css/bootstrap-theme.css" rel="stylesheet"/>
     <link href="./css/main.css" rel="stylesheet"/>
@@ -62,6 +62,24 @@
                 ${table}`
             )
         }
+
+        function onContractDeployed() {
+            message(true, 'Successfully deployed contract!');
+            $('#deploy_button').hide();
+            $('#event_labels').show();
+            $('#title_event_name span').html($('#input_event_name').val());
+            $('#title_event_code span').html($('#input_event_code').val());
+            $('#product_form').show();
+            $('#event_form').hide();
+        }
+
+        function message(success, msg) {
+            const alert = success ? $('#success_alert') : $('#error_alert')
+            alert.html(msg).show()
+            setTimeout(() => {
+                $('#success_alert').hide()
+            }, 5000)
+        }
     </script>
 </head>
 <body bgcolor=white>
@@ -72,21 +90,23 @@
 </div>
 <div class="container">
     <h2>Event info</h2>
-    <form class="form_main">
+    <form id="event_form" class="form_main">
         <input title="Event name" type="text" class="form-control" id="input_event_name"
-               placeholder="Evemt name (for example, Hackathon Blockchain Lovers)">
+               placeholder="Event name (for example, Hackathon Blockchain Lovers)">
         <input title="Event code" type="text" class="form-control" id="input_event_code"
                placeholder="Event code (for identity, for example, blockchain_lovers)">
-        <input title="Token code" type="text" class="form-control" id="input_token_code"
-               placeholder="Token code (3 symbols, for example, ETT)">
     </form>
+    <div id="event_labels" style="display: none">
+        <h2 id="title_event_name"><span class="label label-default"></span></h2>
+        <h2 id="title_event_code"><span class="label label-default"></span></h2>
+    </div>
 
     <div id="products_table_container">
 
 
     </div>
 
-    <div style="margin: 0 100px">
+    <div id="product_form" style="margin: 20px 0; display: none">
         <h2>Add product</h2>
         <form class="form_main">
             <input title="Product name" type="text" class="form-control" id="input_product_name"
@@ -100,10 +120,13 @@
             </button>
         </form>
     </div>
-    <button type="button" class="btn btn-primary btn-warning btn-lg" style="float: right"
-            onclick="deploy($('#input_event_code').val(), $('#input_event_code').val())"> Deploy contract
-    </button>
+    <button type="button" class="btn btn-primary btn-lg" style="float: right"
+            id="deploy_button" data-loading-text="Deploying..."
+            onclick="deploy($('#input_event_code').val(), $('#input_event_code').val())">Deploy contract</button>
+
 </div>
+<div id="success_alert" class="alert alert-success" style="margin: 20px 400px; display: none"></div>
+<div id="error_alert" class="alert alert-danger" style="margin: 20px 400px; display: none"></div>
 
 
 </body>

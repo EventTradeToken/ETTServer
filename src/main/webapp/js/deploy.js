@@ -1,4 +1,6 @@
 function deploy(eventName, eventCode) {
+    const deploy_button = $('#deploy_button')
+    deploy_button.button('loading')
     const solidityVersion = '0.4.24'
     const contractName = `contract_${eventCode}`
     const source = contract({
@@ -25,7 +27,6 @@ function deploy(eventName, eventCode) {
         BrowserSolc.loadVersion(soljsonReleases[solidityVersion], function (solc) {
             // BrowserSolc.loadVersion("soljson-v0.4.23+commit.124ca40d.js", function (solc) {
             console.log(`Compiling contract with solc ${solidityVersion}...`);
-            console.log('Contract source: ', source)
             optimize = 1;
             const output = solc.compile(source, optimize);
             console.log('compiled contract: ', output);
@@ -47,6 +48,8 @@ function deploy(eventName, eventCode) {
             }, (err, res) => {
                 if (err) {
                     console.error(err);
+                    deploy_button.button('reset')
+                    message(false, 'Error while deploying contract')
                     return;
                 }
                 // Log the tx, you can explore status with eth.getTransaction()
@@ -70,9 +73,12 @@ function deploy(eventName, eventCode) {
                         data: JSON.stringify({event, contract}),
                         success: () => {
                             console.log('Successfully saved event and contract to server!')
+                            onContractDeployed()
                         },
                         error: (err) => {
                             console.error(err)
+                            deploy_button.button('reset')
+                            message(false, 'Error while deploying contract')
                         }
                     })
                 }
