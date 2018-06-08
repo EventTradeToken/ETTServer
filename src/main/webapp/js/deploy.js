@@ -1,5 +1,5 @@
-function deploy(eventCode) {
-    const solidityVersion = '0.4.23'
+function deploy(eventName, eventCode) {
+    const solidityVersion = '0.4.24'
     const contractName = `contract_${eventCode}`
     const source = contract({
         solidityVersion,
@@ -34,27 +34,47 @@ function deploy(eventCode) {
             let code = output.contracts[name].bin;
             console.log('Getting abi of contract...');
             const abi = JSON.parse(output.contracts[name].interface);
+            console.log('abi: ', abi)
 
             const contract = web3.eth.contract(abi);
 
             // Deploy contract instance
             console.log('Deploying contract instance...')
             const contractInstance = contract.new({
-                data: '0x' + bytecode,
-                gas: 200000,
-                gasPrice: 5
+                data: bytecode,
+                gas: 2000000,
+                gasPrice: 20
             }, (err, res) => {
                 if (err) {
                     console.error(err);
                     return;
                 }
-                console.log('Successfully deployed contract! Result: ', res)
                 // Log the tx, you can explore status with eth.getTransaction()
                 console.log('transactionHash: ', res.transactionHash);
 
                 // If we have an address property, the contract was deployed
                 if (res.address) {
+                    console.log('Successfully deployed contract! Result: ', res)
                     console.log('Contract address: ' + res.address);
+
+                    const event = {eventName, eventCode}
+                    const contract = {
+                        name: contractName,
+                        address: res.address
+                    }
+
+                    console.log('Saving to server...', event, contract)
+                    $.ajax('/rest/event/new', {
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({event, contract}),
+                        success: () => {
+                            console.log('Successfully saved event and contract to server!')
+                        },
+                        error: (err) => {
+                            console.error(err)
+                        }
+                    })
                 }
             });
         })

@@ -3,12 +3,11 @@ package event.trade.token.storage;
 public class Contract {
     private String name;
     private String address;
-    private String tokenCode;
 
-    public Contract(String name, String address, String tokenCode) {
-        this.name = name;
+    public Contract() {}
+
+    public Contract(String name, String address) {
         this.address = address;
-        this.tokenCode = tokenCode;
     }
 
     public String getName() {
@@ -27,11 +26,8 @@ public class Contract {
         this.address = address;
     }
 
-    public String getTokenCode() {
-        return tokenCode;
-    }
-
-    public void setTokenCode(String tokenCode) {
-        this.tokenCode = tokenCode;
+    @Override
+    public String toString() {
+        return "{name: " + this.name + ", address: " + this.address + "}";
     }
 }

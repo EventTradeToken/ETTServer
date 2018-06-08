@@ -11,13 +11,14 @@ public class Storage {
     private static Map<String, SmartContract> contracts = new HashMap<>();
     static {
         Event event = new Event("Хакатон blockchain lovers", "blockchain_lovers");
-        Contract contract = new Contract("contract_blockchain_lovers", "<address>", "ETT");
+        Contract contract = new Contract("contract_blockchain_lovers", "<address>");
         save(event, contract);
     }
 
     public static void save(Event event, Contract contract) {
         Storage.events.put(event.getEventCode(), event);
         Storage.contracts.put(event.getEventCode(), new SmartContract(contract));
+        System.out.println("Successfully saved event!");
     }
 
     public static Event getEvent(String eventCode) {

@@ -21,6 +21,7 @@ public class Service {
     @GET
     @Path("/hello/{param}")
     public Response getMsg(@PathParam("param") String msg) {
+        System.out.println("------> service /event/hello/" + msg);
         String output = "Jersey say : " + msg;
         return Response.status(200).entity(output).build();
     }
@@ -29,7 +30,16 @@ public class Service {
     @Path("/new")
     @Consumes("application/json")
     public Response newEvent(NewEventRequest body) {
+        System.out.println("------> service /event/new: " + body.toString());
         Storage.save(body.getEvent(), body.getContract());
+        return Response.status(200).build();
+    }
+
+    @POST
+    @Path("/test")
+    @Consumes("application/json")
+    public Response testEvent(Event body) {
+        System.out.println("------> service /event/test: " + body.toString());
         return Response.status(200).build();
     }
 
@@ -62,6 +72,8 @@ class NewEventRequest {
     private Event event;
     private Contract contract;
 
+    public NewEventRequest() {}
+
     public NewEventRequest(Event event, Contract contract) {
         this.event = event;
         this.contract = contract;
@@ -81,5 +93,10 @@ class NewEventRequest {
 
     public void setContract(Contract contract) {
         this.contract = contract;
+    }
+
+    @Override
+    public String toString() {
+        return "{event: " + this.event.toString() + ", contract: " + this.contract.toString() + "}";
     }
 }
