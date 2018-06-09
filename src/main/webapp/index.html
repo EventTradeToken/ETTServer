@@ -12,25 +12,6 @@
 
     <script>
         let products = [];
-        let n = 0;
-
-        function addProduct() {
-            const input_product_name = $('#input_product_name');
-            const input_product_price = $('#input_product_price');
-            const input_products_count = $('#input_products_count');
-
-            const p = {
-                code: `product_${n++}`,
-                name: input_product_name.val(),
-                price: input_product_price.val(),
-                count: input_products_count.val()
-            };
-            products.push(p);
-            renderTable();
-            input_product_name.val('');
-            input_product_price.val('');
-            input_products_count.val('');
-        }
 
         function renderTable() {
             if (!products || !products.length) {
@@ -115,8 +96,8 @@
                    placeholder="Product price">
             <input title="Products count" type="text" class="form-control" id="input_products_count"
                    placeholder="Products count">
-            <button type="button" class="btn btn-primary"
-                    onclick="addProduct()"> Add product
+            <button id="add_product_button" type="button" class="btn btn-primary">
+                Add product
             </button>
         </form>
     </div>

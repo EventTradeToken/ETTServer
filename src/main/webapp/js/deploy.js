@@ -32,16 +32,16 @@ function deploy(eventName, eventCode) {
             console.log('compiled contract: ', output);
             const name = `:${contractName}`
             const bytecode = output.contracts[name].bytecode;
-            let code = output.contracts[name].bin;
             console.log('Getting abi of contract...');
             const abi = JSON.parse(output.contracts[name].interface);
             console.log('abi: ', abi)
 
-            const contract = web3.eth.contract(abi);
+            const EventTradeContract = web3.eth.contract(abi);
+            window.EventTradeContract = EventTradeContract
 
             // Deploy contract instance
             console.log('Deploying contract instance...')
-            const contractInstance = contract.new({
+            const contractInstance = EventTradeContract.new({
                 data: bytecode,
                 gas: 2000000,
                 gasPrice: 20
@@ -66,15 +66,52 @@ function deploy(eventName, eventCode) {
                         address: res.address
                     }
 
+                    const success = () => {
+                        console.log('Successfully saved event and contract to server!')
+                        onContractDeployed()
+
+                        const eventContract = EventTradeContract.at(res.address);
+
+                        let n = 0;
+
+                        function addProduct() {
+                            const input_product_name = $('#input_product_name');
+                            const input_product_price = $('#input_product_price');
+                            const input_products_count = $('#input_products_count');
+
+                            const p = {
+                                code: n++,
+                                name: input_product_name.val(),
+                                price: input_product_price.val(),
+                                count: input_products_count.val()
+                            };
+
+                            console.log('Adding product ', p)
+                            eventContract.addProduct(p.code, p.name, p.price, (err, res) => {
+                                if (err) {
+                                    console.error(err)
+                                }
+                                if (res) {
+                                    console.log('Success! tx: ', res)
+                                }
+                            });
+
+                            products.push(p);
+                            renderTable();
+                            input_product_name.val('');
+                            input_product_price.val('');
+                            input_products_count.val('');
+                        }
+
+                        $('#add_product_button').click(addProduct)
+                    }
+
                     console.log('Saving to server...', event, contract)
                     $.ajax('/rest/event/new', {
                         method: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({event, contract}),
-                        success: () => {
-                            console.log('Successfully saved event and contract to server!')
-                            onContractDeployed()
-                        },
+                        success: success,
                         error: (err) => {
                             console.error(err)
                             deploy_button.button('reset')
@@ -83,6 +120,7 @@ function deploy(eventName, eventCode) {
                     })
                 }
             });
+
         })
     });
 }
