@@ -10,6 +10,7 @@ Event code is a unique string by which clients can find your event using Telegra
 
 After successful deploy you will see a form for adding product. Fill in inputs and press Add product.
 
+Tested on Ropsten network.
 
 ### Backend
 Services:
