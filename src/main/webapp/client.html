@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client</title>
+
+    <script src="./js/libs/jquery-3.3.1.min.js"></script>
+    <script src="./js/libs/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <link href="./js/libs/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet"/>
+    <link href="./js/libs/bootstrap-3.3.7-dist/css/bootstrap-theme.css" rel="stylesheet"/>
+    <link href="./css/main.css" rel="stylesheet"/>
+
+    <script>
+        let client
+        let eventCode
+
+        function registrer(_client, _eventCode) {
+            console.log("Register ", _client, _eventCode, '...')
+            $.ajax(`/rest/event/${_eventCode}/newclient/${_client}`, {
+                success: () => {
+                    client = _client
+                    eventCode = _eventCode
+                    console.log('Success!')
+                    getProducts()
+                }
+            })
+        }
+
+        function getProducts() {
+            console.log('Receiving products...')
+            $.ajax(`/rest/event/${eventCode}/products`, {
+                success: (products) => {
+                    console.log('Success!')
+                    console.log('Products: ', products)
+                    renderTable(products)
+                    $('#event_form').hide()
+                },
+                error: (err) => {
+                    console.error(err)
+                }
+            })
+        }
+
+        function renderTable(products) {
+            if (!products || !products.length) {
+                return
+            }
+            const trs = products.map(p =>
+                `<tr>
+                    <td>${p.name}</td>
+                    <td>${p.price}</td>
+                    <td>${p.count}</td>
+                    <td><button type="button" class="btn btn-primary btn-lg" onclick="buyProduct('${p.code}')">Buy</button></td>
+                </tr>`
+            )
+            const table =
+                `<table class="table">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Count</th>
+                        <th>Buy</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        ${trs}
+                    </tbody>
+                </table>`
+
+            $('#products_table_container').html(
+                `<h2>Products</h2>
+                ${table}`
+            )
+        }
+
+        function buyProduct(productCode) {
+            console.log('Buying product ' + productCode)
+            $.ajax(`/rest/event/${eventCode}/client/${client}/buyproduct/${productCode}`, {
+                success: () => {
+                    console.log('Success!')
+                    getProducts()
+                },
+                error: (err) => {
+                    console.error(err)
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<div class="jumbotron text-center">
+    <h1>Event Trade Token</h1>
+    <p>Use your tokens for buying products!</p>
+</div>
+<div class="container">
+    <form id="event_form" class="form_main">
+        <input title="Client" type="text" class="form-control" id="client_input"
+               placeholder="Please, input your name">
+        <input title="Event code" type="text" class="form-control" id="event_code_input"
+               placeholder="Please, input event code">
+        <button type="button" class="btn btn-primary btn-warning btn-lg" id="register_button"
+                onclick="registrer($('#client_input').val(), $('#event_code_input').val())">Register on event
+        </button>
+    </form>
+    <div id="products_table_container"></div>
+
+</div>
+</body>
+</html>
