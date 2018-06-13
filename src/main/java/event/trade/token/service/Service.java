@@ -9,10 +9,9 @@ import org.json.JSONArray;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.xml.bind.annotation.XmlMimeType;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Path("/event")
@@ -44,27 +43,66 @@ public class Service {
     }
 
     @GET
+    @Path("/file")
+    public Response file() {
+        try {
+            System.out.println("Location: " + this.getClass().getProtectionDomain().getCodeSource().getLocation());
+            System.getProperties().list(System.out);
+            File folder = new File(getClass().getClassLoader().getResource("UTC.json").getFile());
+            System.out.println("Folder: " + folder);
+            for (final File fileEntry : folder.listFiles()) {
+                System.out.println(fileEntry.getName());
+            }
+//            File f = new File("../../../../src/xxx.txt");
+//            f.createNewFile();
+            return Response.status(200).build();
+        } catch (Exception e) {
+            System.out.println(e);
+            return Response.status(500).build();
+        }
+    }
+
+    @GET
     @Path("{eventCode}/newclient/{client}")
     public Response newClient(@PathParam("eventCode") String eventCode, @PathParam("client") String client) {
-        Storage.getContract(eventCode).newClient(client);
-        return Response.status(200).build();
+        try {
+            System.out.println("Service: new client '" + client + "' for event with code: " + eventCode);
+            SmartContract contract = Storage.getContract(eventCode);
+            System.out.println("Smart contract: " + contract);
+            contract.newClient(client);
+            return Response.status(200).build();
+        } catch (Exception e) {
+            System.out.println(e);
+            return Response.status(500).entity(e).build();
+        }
     }
 
     @GET
     @Path("{eventCode}/products")
     @Produces("application/json")
     public Response getProducts(@PathParam("eventCode") String eventCode) {
-        List<Product> products = Storage.getContract(eventCode).getProducts(eventCode);
-        GenericEntity<List<Product>> entities = new GenericEntity<List<Product>>(products){};
-        String output = new JSONArray(products).toString();
-        return Response.status(200).entity(output).build();
+        try {
+            List<Product> products = Storage.getContract(eventCode).getProducts();
+            GenericEntity<List<Product>> entities = new GenericEntity<List<Product>>(products) {
+            };
+            String output = new JSONArray(products).toString();
+            return Response.status(200).entity(output).build();
+        } catch (Exception e) {
+            System.out.println(e);
+            return Response.status(500).entity(e).build();
+        }
     }
 
     @GET
     @Path("{eventCode}/client/{client}/buyproduct/{productCode}")
     public Response buyProduct(@PathParam("eventCode") String eventCode, @PathParam("client") String client, @PathParam("productCode") String productCode) {
-        Storage.getContract(eventCode).buyProduct(eventCode, client, productCode);
-        return Response.status(200).build();
+        try {
+            Storage.getContract(eventCode).buyProduct(client, Integer.parseInt(productCode));
+            return Response.status(200).build();
+        } catch (Exception e) {
+            System.out.println(e);
+            return Response.status(500).entity(e).build();
+        }
     }
 }
 
@@ -72,7 +110,8 @@ class NewEventRequest {
     private Event event;
     private Contract contract;
 
-    public NewEventRequest() {}
+    public NewEventRequest() {
+    }
 
     public NewEventRequest(Event event, Contract contract) {
         this.event = event;

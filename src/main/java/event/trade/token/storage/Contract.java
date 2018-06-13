@@ -7,6 +7,7 @@ public class Contract {
     public Contract() {}
 
     public Contract(String name, String address) {
+        this.name = name;
         this.address = address;
     }
 

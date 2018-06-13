@@ -26,6 +26,7 @@ public class Storage {
     }
 
     public static SmartContract getContract(String eventCode) {
+        System.out.println("Getting smart contract for eventCode: " + eventCode);
         return Storage.contracts.get(eventCode);
     }
 }
