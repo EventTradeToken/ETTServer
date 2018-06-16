@@ -4,7 +4,6 @@ import api.ContractAPI;
 import api.EventTradeToken;
 import event.trade.token.storage.Contract;
 import event.trade.token.storage.Product;
-import org.web3j.tuples.generated.Tuple3;
 import org.web3j.tuples.generated.Tuple4;
 
 import java.math.BigInteger;
@@ -38,7 +37,7 @@ public class SmartContract {
         List<Product> products = new ArrayList<>();
         for (int i = 0; i < count.intValue(); i++) {
             Tuple4<BigInteger, String, BigInteger, BigInteger> p = this.ett.getProductByIndex(BigInteger.valueOf(i)).send();
-            Product product = new Product(p.getValue1().intValue(), p.getValue2(), (float)p.getValue3().intValue(), p.getValue4().intValue());
+            Product product = new Product(p.getValue1().intValue(), p.getValue2(), (float) p.getValue3().intValue(), p.getValue4().intValue());
             products.add(product);
         }
         System.out.println("Got " + products.size() + " products from contract");
