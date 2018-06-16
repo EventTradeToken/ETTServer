@@ -10,8 +10,8 @@ import org.json.JSONArray;
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
 import java.util.List;
 
 @Path("/event")
@@ -46,16 +46,33 @@ public class Service {
     @Path("/file")
     public Response file() {
         try {
-            System.out.println("Location: " + this.getClass().getProtectionDomain().getCodeSource().getLocation());
             System.getProperties().list(System.out);
-            File folder = new File(getClass().getClassLoader().getResource("UTC.json").getFile());
-            System.out.println("Folder: " + folder);
-            for (final File fileEntry : folder.listFiles()) {
-                System.out.println(fileEntry.getName());
-            }
-//            File f = new File("../../../../src/xxx.txt");
-//            f.createNewFile();
-            return Response.status(200).build();
+            StreamingOutput stream = new StreamingOutput() {
+                @Override
+                public void write(OutputStream os) throws IOException, WebApplicationException {
+                    PrintStream print = new PrintStream(os);
+                    System.getProperties().list(print);
+                    print.flush();
+                }
+            };
+            return Response.ok(stream).build();
+        } catch (Exception e) {
+            System.out.println(e);
+            return Response.status(500).build();
+        }
+    }
+
+    @GET
+    @Path("/properties")
+    public Response properties() {
+        try {
+            StringBuffer sb = new StringBuffer();
+            sb.append("walletSource: ");
+            sb.append(System.getProperty("walletSource").toString());
+            sb.append(", ");
+            sb.append("walletPassword: ");
+            sb.append(System.getProperty("walletPassword").toString());
+            return Response.ok(sb.toString()).build();
         } catch (Exception e) {
             System.out.println(e);
             return Response.status(500).build();
