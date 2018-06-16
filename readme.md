@@ -27,3 +27,4 @@ Deploy to heroku:
 - only latin symbols
 - you can't return to your event web interface for adding products after you close browser tab
 - you can't change products or event info
+- you should add products one by one

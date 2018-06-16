@@ -15,13 +15,20 @@
         let eventCode
 
         function registrer(_client, _eventCode) {
-            console.log("Register ", _client, _eventCode, '...')
+            console.log("Register ", _client, _eventCode, '...');
+            const register_button = $('#register_button');
+            register_button.button('loading');
             $.ajax(`/rest/event/${_eventCode}/newclient/${_client}`, {
                 success: () => {
                     client = _client
                     eventCode = _eventCode
                     console.log('Success!')
+                    register_button.button('reset');
                     getProducts()
+                },
+                error: () => {
+                    console.log('Failed')
+                    register_button.button('reset');
                 }
             })
         }
@@ -50,7 +57,9 @@
                     <td>${p.name}</td>
                     <td>${p.price}</td>
                     <td>${p.count}</td>
-                    <td><button type="button" class="btn btn-primary btn-lg" onclick="buyProduct('${p.code}')">Buy</button></td>
+                    <td><button type="button" class="btn btn-primary btn-lg"
+                        id="buy_product_${p.code}_button" data-loading-text="Buying..."
+                        onclick="buyProduct('${p.code}')">Buy</button></td>
                 </tr>`
             )
             const table =
@@ -76,12 +85,16 @@
 
         function buyProduct(productCode) {
             console.log('Buying product ' + productCode)
+            const buy_product_button = $(`#buy_product_${productCode}_button`)
+            buy_product_button.button('loading')
             $.ajax(`/rest/event/${eventCode}/client/${client}/buyproduct/${productCode}`, {
                 success: () => {
                     console.log('Success!')
+                    buy_product_button.button('reset')
                     getProducts()
                 },
                 error: (err) => {
+                    buy_product_button.button('reset')
                     console.error(err)
                 }
             })
@@ -89,7 +102,7 @@
     </script>
 </head>
 <body>
-<div class="jumbotron text-center">
+<div class="page-header text-center">
     <h1>Event Trade Token</h1>
     <p>Use your tokens for buying products!</p>
 </div>
@@ -99,7 +112,8 @@
                placeholder="Please, input your name">
         <input title="Event code" type="text" class="form-control" id="event_code_input"
                placeholder="Please, input event code">
-        <button type="button" class="btn btn-primary btn-warning btn-lg" id="register_button"
+        <button type="button" class="btn btn-primary btn-warning btn-lg"
+                id="register_button" data-loading-text="Registering..."
                 onclick="registrer($('#client_input').val(), $('#event_code_input').val())">Register on event
         </button>
     </form>

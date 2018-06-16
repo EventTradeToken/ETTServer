@@ -32,9 +32,9 @@ function deploy(eventName, eventCode) {
             console.log('compiled contract: ', output);
             const name = `:${contractName}`
             const bytecode = output.contracts[name].bytecode;
-            console.log('Getting abi of contract....');
+            console.log('Getting abi of contract...');
             const abi = JSON.parse(output.contracts[name].interface);
-            console.log('abi!!!!!:: ', JSON.stringify(abi))
+            console.log('abi: ', JSON.stringify(abi))
 
             const EventTradeContract = web3.eth.contract(abi);
             window.EventTradeContract = EventTradeContract
