@@ -14,11 +14,17 @@ import java.util.List;
 public class SmartContract {
 
     private EventTradeToken ett;
+    private String address;
 
     public SmartContract(Contract contract) {
         ContractAPI contractAPI = new ContractAPI();
         this.ett = contractAPI.getContract(contract.getAddress());
+        this.address = contract.getAddress();
         System.out.println("Smart contract with address " + contract.getAddress() + ", Event Trade Token: " + this.ett);
+    }
+
+    public String getAddress() {
+        return this.address;
     }
 
     public void newClient(String client) throws Exception {

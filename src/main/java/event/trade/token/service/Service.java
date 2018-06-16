@@ -85,7 +85,7 @@ public class Service {
         try {
             System.out.println("Service: new client '" + client + "' for event with code: " + eventCode);
             SmartContract contract = Storage.getContract(eventCode);
-            System.out.println("Smart contract: " + contract);
+            System.out.println("Smart contract address: " + contract.getAddress());
             contract.newClient(client);
             return Response.status(200).build();
         } catch (Exception e) {
